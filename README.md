@@ -6,6 +6,9 @@ how scheduled workflows, automation, and commits work on GitHub.
 It can generate **automated contribution activity**
 (light, medium, and dark green squares) for educational and experimental purposes.
 
+<img width="1335" height="340" alt="image" src="https://github.com/user-attachments/assets/6b92a8cc-5fa2-4c0e-8597-90df9de27b55" />
+
+
 ---
 
 ## 🔁 How to Use This Repository
