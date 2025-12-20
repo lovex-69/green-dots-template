@@ -1,0 +1,58 @@
+name: Backfill Green Dots
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: 'Start date (YYYY-MM-DD)'
+        required: true
+      end_date:
+        description: 'End date (YYYY-MM-DD)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ secrets.GITHUB_EMAIL }}"
+
+      - name: Backfill commits
+        run: |
+          START="${{ github.event.inputs.start_date }}"
+          END="${{ github.event.inputs.end_date }}"
+
+          current=$(date -d "$START" +%s)
+          end=$(date -d "$END" +%s)
+
+          while [ "$current" -le "$end" ]; do
+            DATE=$(date -d "@$current" "+%Y-%m-%d")
+            COMMITS=$((RANDOM % 9))
+
+            if [ "$COMMITS" -eq 0 ]; then
+              current=$((current + 86400))
+              continue
+            fi
+
+            echo "📅 $DATE → $COMMITS commits"
+
+            for i in $(seq 1 $COMMITS); do
+              echo "$DATE commit $i" >> activity.txt
+              git add activity.txt
+              GIT_AUTHOR_DATE="$DATE 12:$((RANDOM % 60)):00" \
+              GIT_COMMITTER_DATE="$DATE 12:$((RANDOM % 60)):00" \
+              git commit -m "backfill $DATE #$i"
+            done
+
+            current=$((current + 86400))
+          done
+
+          git push
