@@ -1,0 +1,48 @@
+name: Daily Green Dots
+
+on:
+  schedule:
+    - cron: '15 10 * * *' # daily (UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ secrets.GITHUB_EMAIL }}"
+
+      - name: Generate commits
+        run: |
+          DAY=$(date +%u)
+
+          # Weekday vs weekend behavior
+          if [ "$DAY" -ge 6 ]; then
+            COMMITS=$((RANDOM % 3))      # 0–2 on weekends
+          else
+            COMMITS=$((RANDOM % 9))      # 0–8 on weekdays
+          fi
+
+          # Occasionally create darker days (early month)
+          if [ "$(date +%d)" -le 3 ]; then
+            COMMITS=$((RANDOM % 6 + 5))  # 5–10 commits
+          fi
+
+          echo "Commits today: $COMMITS"
+
+          for i in $(seq 1 $COMMITS); do
+            echo "$(date) - commit $i" >> activity.txt
+            git add activity.txt
+            git commit -m "daily activity $i" --date="$(date)"
+            sleep $((RANDOM % 30 + 10))
+          done
+
+          git push
