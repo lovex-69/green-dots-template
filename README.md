@@ -94,8 +94,8 @@ This feature exists to **demonstrate how commit dates affect contribution graphs
 2. Select **Backfill Green Dots**
 3. Click **Run workflow**
 4. Enter dates, for example:
-start_date: 2025-01-01
-end_date: 2025-01-14
+`start_date: 2025-01-01`
+`end_date: 2025-01-14`
 
 
 ⏳ Graph updates usually appear within a few minutes.
